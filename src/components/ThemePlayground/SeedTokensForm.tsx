@@ -2,7 +2,6 @@
 import React, { useState } from "react";
 import { Form, Row, Col, ColorPicker, Input, InputNumber, Select, Switch, ThemeConfig, Typography } from "antd";
 import type { SeedToken } from "antd/es/theme/internal";
-import type { ColorFactory } from "antd/es/color-picker/color";
 
 const { Paragraph } = Typography;
 interface SeedTokensFormProps {
@@ -65,14 +64,17 @@ const SeedTokensForm: React.FC<SeedTokensFormProps> = ({ customizableTheme, setC
 
     const handleOnValuesChange = (changedValues: any, allValues: any) => {
         // Filter out undefined values
-        const definedValues = Object.fromEntries(Object.entries(allValues).filter(([key, value]) => value !== undefined));
+        const definedValues = Object.fromEntries(
+            Object.entries(allValues).filter(([key, value]) => value !== undefined),
+        );
 
         // Convert ColorFactory objects to hex strings
+        // Convert Color objects to hex strings
         const convertedValues: ThemeConfig["token"] = Object.entries(definedValues).reduce((acc, [key, value]) => {
             if (typeof value === "object" && value !== null && "toHexString" in value) {
                 // TODO: Fix this type assertion
                 // @ts-ignore
-                acc[key] = (value as ColorFactory).toHexString();
+                acc[key] = value.toHexString();
             } else {
                 // TODO: Fix this type assertion
                 // @ts-ignore
@@ -80,7 +82,6 @@ const SeedTokensForm: React.FC<SeedTokensFormProps> = ({ customizableTheme, setC
             }
             return acc;
         }, {});
-
         setCustomizableTheme({
             ...customizableTheme,
             token: {
@@ -92,7 +93,12 @@ const SeedTokensForm: React.FC<SeedTokensFormProps> = ({ customizableTheme, setC
 
     if (customizableTheme.token && allSeedTokenProperties.length > 0) {
         return (
-            <Form labelCol={{ span: 24 }} wrapperCol={{ span: 24 }} layout="vertical" onValuesChange={handleOnValuesChange}>
+            <Form
+                labelCol={{ span: 24 }}
+                wrapperCol={{ span: 24 }}
+                layout="vertical"
+                onValuesChange={handleOnValuesChange}
+            >
                 <Row gutter={[24, 12]}>
                     {allSeedTokenProperties.map((property) => {
                         let type = typeof customizableTheme.token?.[property];
@@ -102,7 +108,15 @@ const SeedTokensForm: React.FC<SeedTokensFormProps> = ({ customizableTheme, setC
                             if (type === "string") {
                                 if (value?.toString().startsWith("#") || property.startsWith("color")) {
                                     // If color, display color picker
-                                    return <ColorPicker defaultValue={value as string} defaultFormat="hex" format="hex" showText disabledAlpha />;
+                                    return (
+                                        <ColorPicker
+                                            defaultValue={value as string}
+                                            defaultFormat="hex"
+                                            format="hex"
+                                            showText
+                                            disabledAlpha
+                                        />
+                                    );
                                 } else if (property === "fontFamily") {
                                     // If font family, display font family selection
                                     return (
@@ -157,7 +171,13 @@ const SeedTokensForm: React.FC<SeedTokensFormProps> = ({ customizableTheme, setC
                             } else if (type === "number") {
                                 return <InputNumber defaultValue={value as number} />;
                             } else if (type === "boolean") {
-                                return <Switch checkedChildren="true" unCheckedChildren="false" defaultChecked={value as boolean} />;
+                                return (
+                                    <Switch
+                                        checkedChildren="true"
+                                        unCheckedChildren="false"
+                                        defaultChecked={value as boolean}
+                                    />
+                                );
                             }
                         };
 
