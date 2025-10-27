@@ -3,11 +3,12 @@
 import React, { useState } from "react";
 import { Switch, Select, Input, InputNumber, Card, Space, Typography, Divider } from "antd";
 
-const { Title, Text } = Typography;
+const { Title, Text, Paragraph } = Typography;
 const { Option } = Select;
 
 // HTML input types that are commonly used
 const inputTypes = [
+    "undefined",
     "text",
     "password",
     "email",
@@ -24,14 +25,14 @@ const inputTypes = [
 ];
 
 // HTML inputmode attribute values
-const inputModes = ["none", "text", "decimal", "numeric", "tel", "search", "email", "url"] as const;
+const inputModes = ["undefined", "none", "text", "decimal", "numeric", "tel", "search", "email", "url"] as const;
 
 type InputMode = (typeof inputModes)[number];
 
 export default function InputModesPage() {
     const [useInputNumber, setUseInputNumber] = useState(false);
-    const [inputType, setInputType] = useState<string>("text");
-    const [inputMode, setInputMode] = useState<InputMode>("text");
+    const [inputType, setInputType] = useState<string>("undefined");
+    const [inputMode, setInputMode] = useState<InputMode>("undefined");
     const [inputValue, setInputValue] = useState<string | number>("");
 
     const handleInputChange = (value: string | number | null) => {
@@ -118,8 +119,8 @@ export default function InputModesPage() {
                                     onChange={handleInputChange}
                                     placeholder="Enter a number..."
                                     style={{ width: "300px" }}
-                                    // Note: InputNumber doesn't support type and inputmode attributes directly
-                                    // as it's specifically designed for numeric input
+                                    type={inputType === "undefined" ? undefined : inputType}
+                                    inputMode={inputMode === "undefined" ? undefined : inputMode}
                                 />
                             ) : (
                                 <Input
@@ -127,12 +128,27 @@ export default function InputModesPage() {
                                     onChange={(e) => handleInputChange(e.target.value)}
                                     placeholder="Enter text..."
                                     style={{ width: "300px" }}
-                                    // Apply the HTML attributes
-                                    type={inputType}
-                                    inputMode={inputMode}
+                                    type={inputType === "undefined" ? undefined : inputType}
+                                    inputMode={inputMode === "undefined" ? undefined : inputMode}
                                 />
                             )}
                         </div>
+                    </div>
+
+                    <div>
+                        <Text strong>Component Code:</Text>
+                        <Paragraph
+                            copyable
+                            style={{
+                                marginTop: "8px",
+                                padding: "8px",
+                                backgroundColor: "#f5f5f5",
+                                borderRadius: "4px",
+                                fontFamily: "monospace",
+                            }}
+                        >
+                            {`<${useInputNumber ? "InputNumber" : "Input"}${inputType !== "undefined" ? ` type="${inputType}"` : ""}${inputMode !== "undefined" ? ` inputMode="${inputMode}"` : ""} />`}
+                        </Paragraph>
                     </div>
 
                     <div>
