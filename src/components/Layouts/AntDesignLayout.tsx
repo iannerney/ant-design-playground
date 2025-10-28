@@ -15,8 +15,11 @@ const AntDesignLayout: React.FC<AntDesignLayoutProps> = ({ children }) => {
         <Layout>
             <Header style={{ background: token.colorPrimary, color: token.colorBgBase }}>
                 <Flex gap="small" justify="space-between" align="center" style={{ fontSize: "18px" }}>
-                    <h1>Ant Design Theme Playground</h1>
-                    <a href="https://github.com/iannerney/ant-design-theme-playground" style={{ color: token.colorBgBase }}>
+                    <h1>Ant Design Playground</h1>
+                    <a
+                        href="https://github.com/iannerney/ant-design-theme-playground"
+                        style={{ color: token.colorBgBase }}
+                    >
                         <GithubOutlined />
                     </a>
                 </Flex>
