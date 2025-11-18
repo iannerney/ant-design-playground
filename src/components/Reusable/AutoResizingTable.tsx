@@ -1,5 +1,6 @@
+"use client";
 import React, { useEffect, useState } from "react";
-import { Table, type TableProps } from "antd";
+import { Table, type TableProps, Spin } from "antd";
 
 interface AutoResizingTableProps<T = any> extends TableProps<T> {}
 
@@ -8,26 +9,45 @@ const AutoResizingTable = <T extends Record<string, any> = any>({ ...rest }: Aut
     // Value in pixels above and below the table
     const fixedHeightOffset = 400;
 
-    // Set the event listeners for resizing
-    // 600 is a fallback for SSR
-    const [windowHeight, setWindowHeight] = useState(typeof window !== "undefined" ? window.innerHeight : 600);
+    // Track if component has hydrated on client side
+    const [isClient, setIsClient] = useState(false);
+    const [windowHeight, setWindowHeight] = useState(600); // Default fallback
 
     useEffect(() => {
-        // Only run on client side
-        if (typeof window === "undefined") return;
+        // Mark as client-side and set up window listeners
+        if (typeof window !== "undefined") {
+            const handleResize = () => {
+                setWindowHeight(window.innerHeight);
+            };
 
-        const handleResize = () => {
+            // Set initial height and mark as client-side
             setWindowHeight(window.innerHeight);
-        };
+            setIsClient(true);
 
-        // Set initial height
-        setWindowHeight(window.innerHeight);
-        window.addEventListener("resize", handleResize);
+            window.addEventListener("resize", handleResize);
 
-        return () => {
-            window.removeEventListener("resize", handleResize);
-        };
+            return () => {
+                window.removeEventListener("resize", handleResize);
+            };
+        }
     }, []);
+
+    // Show loading spinner until client-side hydration is complete
+    if (!isClient) {
+        return (
+            <div
+                style={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    height: 200,
+                    width: "100%",
+                }}
+            >
+                <Spin size="large" tip="Loading table..." />
+            </div>
+        );
+    }
 
     return <Table scroll={{ y: windowHeight - fixedHeightOffset, x: "max-content" }} {...rest} />;
 };
